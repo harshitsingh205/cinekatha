@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="UniversalDL — Download videos, audio, GIFs, and photos across 1000+ sites on Android with built-in media playback and clip cutting." />
+  <title>UniversalDL | Download Anything. From Anywhere. In Any Format.</title>
+  <style>
+    :root {
+      --bg-page: #0b0f17;
+      --bg-surface: #121826;
+      --bg-elevated: #192234;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent: #38bdf8;
+      --accent-strong: #0284c7;
+      --accent-ink: #04131d;
+      --border: #243047;
+      --focus-ring: rgba(56, 189, 248, 0.45);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --container-max: 1120px;
+      --transition: 180ms ease;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--focus-ring);
+      outline-offset: 2px;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: -9999px;
+      top: 0;
+      background: var(--accent);
+      color: var(--accent-ink);
+      font-weight: 700;
+      padding: 0.75rem 1rem;
+      z-index: 2000;
+    }
+
+    .skip-link:focus {
+      left: 1rem;
+      top: 1rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .container {
+      width: min(100% - 2rem, var(--container-max));
+      margin-inline: auto;
+    }
+
+    /* Header */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(11, 15, 23, 0.88);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 4.25rem;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: var(--text-primary);
+    }
+
+    .brand:hover {
+      text-decoration: none;
+    }
+
+    .brand-badge {
+      display: inline-grid;
+      place-items: center;
+      width: 2rem;
+      height: 2rem;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--accent), #818cf8);
+      color: var(--accent-ink);
+      font-weight: 800;
+      font-size: 0.9rem;
+    }
+
+    .nav-list {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-link {
+      color: var(--text-secondary);
+      font-weight: 500;
+      padding: 0.25rem 0;
+      transition: color var(--transition);
+    }
+
+    .nav-link:hover,
+    .nav-link[aria-current="page"] {
+      color: var(--text-primary);
+      text-decoration: none;
+    }
+
+    .nav-link[aria-current="page"] {
+      border-bottom: 2px solid var(--accent);
+    }
+
+    .nav-toggle {
+      display: none;
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.45rem 0.7rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Hero */
+    .hero {
+      padding-block: 4rem 3rem;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    .eyebrow {
+      margin: 0 0 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    h1 {
+      margin: 0 0 0.85rem;
+      font-size: clamp(2.1rem, 4.2vw, 3.1rem);
+      line-height: 1.12;
+      letter-spacing: -0.025em;
+    }
+
+    .hero-copy {
+      margin: 0 0 1.5rem;
+      color: var(--text-secondary);
+      font-size: 1.05rem;
+      max-width: 60ch;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 0.7rem 1.2rem;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 0.95rem;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: background-color var(--transition), border-color var(--transition);
+    }
+
+    .btn:hover {
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--accent-ink);
+    }
+
+    .btn-primary:hover {
+      background: #7dd3fc;
+    }
+
+    .btn-secondary {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border-color: var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-elevated);
+    }
+
+    .meta-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .pill {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+    }
+
+    .panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+    }
+
+    .panel h2 {
+      margin: 0 0 0.75rem;
+      font-size: 1.15rem;
+    }
+
+    .clean-list {
+      margin: 0;
+      padding-left: 1.2rem;
+      color: var(--text-secondary);
+    }
+
+    .clean-list li + li {
+      margin-top: 0.5rem;
+    }
+
+    /* Sections */
+    .section {
+      padding-block: 3rem;
+      border-top: 1px solid rgba(36, 48, 71, 0.55);
+    }
+
+    .section-header {
+      margin-bottom: 1.75rem;
+    }
+
+    .section-header h2 {
+      margin: 0 0 0.35rem;
+      font-size: 1.65rem;
+    }
+
+    .section-header p {
+      margin: 0;
+      color: var(--text-secondary);
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.25rem;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.25rem;
+    }
+
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.35rem;
+    }
+
+    .card h3 {
+      margin: 0 0 0.45rem;
+      font-size: 1.08rem;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--text-secondary);
+      font-size: 0.94rem;
+    }
+
+    pre {
+      margin: 0.75rem 0 0;
+      padding: 1rem;
+      background: var(--bg-page);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow-x: auto;
+      font-size: 0.85rem;
+      color: #e2e8f0;
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.9em;
+    }
+
+    /* Privacy View / Section */
+    .privacy-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+    }
+
+    .privacy-meta {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      margin: 0.25rem 0 1.5rem;
+    }
+
+    .privacy-block + .privacy-block {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .privacy-block h3 {
+      margin: 0 0 0.45rem;
+      font-size: 1.1rem;
+    }
+
+    .privacy-block p {
+      margin: 0 0 0.5rem;
+      color: var(--text-secondary);
+    }
+
+    .preference-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-top: 1rem;
+      padding: 1rem;
+      background: var(--bg-page);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+    }
+
+    .status-text {
+      font-size: 0.88rem;
+      color: var(--accent);
+      margin-top: 0.5rem;
+      min-height: 1.25rem;
+    }
+
+    .notice {
+      margin-top: 1.5rem;
+      padding: 1rem 1.25rem;
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      color: var(--text-secondary);
+      font-size: 0.92rem;
+    }
+
+    /* Footer */
+    .site-footer {
+      border-top: 1px solid var(--border);
+      padding-block: 1.5rem;
+      margin-top: 2rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .footer-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.25rem;
+    }
+
+    @media (max-width: 860px) {
+      .hero-grid,
+      .grid-3,
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-toggle {
+        display: inline-flex;
+      }
+
+      .primary-nav {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--bg-surface);
+        border-bottom: 1px solid var(--border);
+        padding: 1rem;
+      }
+
+      .primary-nav.is-open {
+        display: block;
+      }
+
+      .nav-list {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="container nav-wrapper">
+      <a href="#top" class="brand">
+        <span class="brand-badge" aria-hidden="true">UD</span>
+        <span>UniversalDL</span>
+      </a>
+
+      <button
+        type="button"
+        class="nav-toggle"
+        aria-expanded="false"
+        aria-controls="primary-nav"
+      >
+        Menu
+      </button>
+
+      <nav id="primary-nav" class="primary-nav" aria-label="Primary Navigation">
+        <ul class="nav-list">
+          <li><a href="#features" class="nav-link">Features</a></li>
+          <li><a href="#install" class="nav-link">Install &amp; Build</a></li>
+          <li><a href="#stack" class="nav-link">Tech Stack</a></li>
+          <li><a href="#privacy" class="nav-link" id="nav-privacy">Privacy Policy</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <section id="top" class="hero">
+      <div class="container hero-grid">
+        <div>
+          <p class="eyebrow">Android 7.0+ &bull; Kotlin &bull; Jetpack Compose</p>
+          <h1>Download anything. From anywhere. In any format.</h1>
+          <p class="hero-copy">
+            UniversalDL is an Android media downloader for videos, audio, GIFs, and photos across
+            YouTube, Facebook, Instagram, X (Twitter), TikTok, Twitch, Reddit, and 1,000+ sites—complete
+            with a built-in media player and a YouTube/Twitch clip cutter.
+          </p>
+          <div class="hero-actions">
+            <a href="#install" class="btn btn-primary">Get Started</a>
+            <a href="#privacy" class="btn btn-secondary">Privacy Policy</a>
+          </div>
+          <div class="meta-pills" aria-label="Project Highlights">
+            <span class="pill">Material 3 &bull; Light &amp; Dark</span>
+            <span class="pill">yt-dlp + FFmpeg</span>
+            <span class="pill">Media3 / ExoPlayer</span>
+            <span class="pill">MIT License</span>
+          </div>
+        </div>
+
+        <aside class="panel" aria-label="Quick Workflow">
+          <h2>How to Use</h2>
+          <ol class="clean-list">
+            <li>Copy a link from any supported app or site.</li>
+            <li>Paste it into UniversalDL or share directly to the app.</li>
+            <li>Pick format &amp; quality: video, audio, GIF, or photo.</li>
+            <li>Optionally trim exact start/end times in Clip Cutter.</li>
+            <li>Download and play immediately in the built-in player.</li>
+          </ol>
+        </aside>
+      </div>
+    </section>
+
+    <section id="features" class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Core Capabilities</h2>
+          <p>Designed for multi-format extraction, precise trimming, and smooth offline playback.</p>
+        </div>
+        <div class="grid-3">
+          <article class="card">
+            <h3>Any Format, Any Resolution</h3>
+            <p>Save videos (MP4, WebM, MKV from 144p to 4K), audio (MP3, M4A, OPUS, WAV), animated GIFs, and full-quality photos or carousels.</p>
+          </article>
+          <article class="card">
+            <h3>YouTube &amp; Twitch Clip Cutter</h3>
+            <p>Select exact start and end timestamps to download only the clip you need without saving an entire video file.</p>
+          </article>
+          <article class="card">
+            <h3>Built-In Player &amp; Queue</h3>
+            <p>Play audio in the background or watch with video gesture controls while managing multi-threaded pause, resume, and queue tasks.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="install" class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Install &amp; Build from Source</h2>
+          <p>Requires Android Studio (latest stable), JDK 17, and Android SDK 34.</p>
+        </div>
+        <div class="grid-2">
+          <article class="card">
+            <h3>Install via APK</h3>
+            <p>Download the latest <code>UniversalDL.apk</code> from the project Releases page, allow installing from unknown sources if prompted, paste a link, and start downloading.</p>
+          </article>
+          <article class="card">
+            <h3>Build with Gradle</h3>
+            <p>Clone the repository and compile a debug build locally:</p>
+            <pre><code>git clone https://github.com/SweetSamosa/UniversalDL.git
+cd UniversalDL
+./gradlew assembleDebug
+./gradlew installDebug</code></pre>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="stack" class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Tech Stack &amp; Roadmap</h2>
+          <p>Modern Android architecture paired with battle-tested media extraction and processing engines.</p>
+        </div>
+        <div class="grid-2">
+          <article class="card">
+            <h3>Architecture</h3>
+            <ul class="clean-list">
+              <li><strong>Language &amp; UI:</strong> Kotlin with Jetpack Compose &amp; Material 3</li>
+              <li><strong>Async &amp; Playback:</strong> Kotlin Coroutines + Flow, Media3 / ExoPlayer</li>
+              <li><strong>Media Pipeline:</strong> <code>yt-dlp</code> extraction + <code>FFmpeg</code> processing</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Upcoming Roadmap</h3>
+            <ul class="clean-list">
+              <li>Playlist and channel batch downloads</li>
+              <li>Subtitle downloads</li>
+              <li>Scheduled downloads</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="privacy" class="section" aria-labelledby="privacy-heading">
+      <div class="container">
+        <div class="privacy-box">
+          <p class="eyebrow">Privacy Policy</p>
+          <h2 id="privacy-heading">UniversalDL Privacy Policy</h2>
+          <p class="privacy-meta">Last updated: November 25, 2026</p>
+
+          <div class="privacy-block">
+            <h3>1. Information Handling</h3>
+            <p>
+              UniversalDL is built for local media downloading and playback on your device. Link inputs,
+              format choices, and download queues are processed to fulfill your requested downloads.
+            </p>
+          </div>
+
+          <div class="privacy-block">
+            <h3>2. Network Requests &amp; Third-Party Sites</h3>
+            <p>
+              When you paste or share a URL, the app connects to the target source or media extractor
+              required to fetch stream metadata and media files. External websites operate under their
+              own privacy policies and terms of service.
+            </p>
+          </div>
+
+          <div class="privacy-block">
+            <h3>3. Local Storage &amp; Preferences</h3>
+            <p>
+              App settings (such as theme mode, download preferences, and local privacy choices) are
+              stored locally rather than sold or brokered to third parties.
+            </p>
+            <div class="preference-row">
+              <div>
+                <strong>Local Diagnostics &amp; Crash Preference</strong>
+                <div class="meta-text" style="margin: 0.2rem 0 0;">Stored locally in your browser via <code>localStorage</code>.</div>
+              </div>
+              <button type="button" class="btn btn-secondary" id="toggle-diagnostics">
+                Toggle Local Preference
+              </button>
+            </div>
+            <p id="privacy-status" class="status-text" role="status" aria-live="polite"></p>
+          </div>
+
+          <div class="privacy-block">
+            <h3>4. Responsibility &amp; Copyright</h3>
+            <p>
+              Use UniversalDL strictly for personal use and only for content you own or have explicit
+              permission to download. Respect applicable copyright laws and platform terms of service.
+            </p>
+          </div>
+
+          <div class="notice">
+            <strong>Disclaimer:</strong> UniversalDL is intended for personal use only. The developer is
+            not responsible for any misuse of the application. Released under the MIT License.
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-wrapper">
+      <p>&copy; <span id="year">2026</span> UniversalDL. Released under the MIT License.</p>
+      <nav class="footer-links" aria-label="Footer Links">
+        <a href="#top">Home</a>
+        <a href="#features">Features</a>
+        <a href="#privacy">Privacy Policy</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      const yearEl = document.getElementById("year");
+      const toggleBtn = document.querySelector(".nav-toggle");
+      const navEl = document.getElementById("primary-nav");
+      const diagBtn = document.getElementById("toggle-diagnostics");
+      const statusEl = document.getElementById("privacy-status");
+      const STORAGE_KEY = "universaldL_local_diagnostics";
+
+      if (yearEl) {
+        yearEl.textContent = String(new Date().getFullYear());
+      }
+
+      if (toggleBtn && navEl) {
+        toggleBtn.addEventListener("click", () => {
+          const expanded = toggleBtn.getAttribute("aria-expanded") === "true";
+          toggleBtn.setAttribute("aria-expanded", String(!expanded));
+          navEl.classList.toggle("is-open", !expanded);
+        });
+
+        navEl.querySelectorAll("a").forEach((link) => {
+          link.addEventListener("click", () => {
+            toggleBtn.setAttribute("aria-expanded", "false");
+            navEl.classList.remove("is-open");
+          });
+        });
+
+        document.addEventListener("keydown", (event) => {
+          if (event.key === "Escape" && navEl.classList.contains("is-open")) {
+            toggleBtn.setAttribute("aria-expanded", "false");
+            navEl.classList.remove("is-open");
+            toggleBtn.focus();
+          }
+        });
+      }
+
+      function renderDiagnosticsStatus() {
+        if (!statusEl) return;
+        let enabled = false;
+        try {
+          enabled = localStorage.getItem(STORAGE_KEY) === "true";
+        } catch (_) {
+          enabled = false;
+        }
+        statusEl.textContent = enabled
+          ? "Local preference saved: Optional local diagnostics flag is ON."
+          : "Local preference saved: Optional local diagnostics flag is OFF (default).";
+      }
+
+      if (diagBtn) {
+        diagBtn.addEventListener("click", () => {
+          let nextState = true;
+          try {
+            nextState = localStorage.getItem(STORAGE_KEY) !== "true";
+            localStorage.setItem(STORAGE_KEY, String(nextState));
+          } catch (_) {
+            nextState = !nextState;
+          }
+          renderDiagnosticsStatus();
+        });
+        renderDiagnosticsStatus();
+      }
+    })();
+  </script>
+</body>
+</html>
